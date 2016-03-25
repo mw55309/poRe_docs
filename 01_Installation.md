@@ -23,6 +23,10 @@ Open R and choose Packages -> Install package(s) from local zip file. Navigate t
 ### Linux/Mac
 Download the latest tar.gz file from [SourceForge](https://sourceforge.net/projects/rpore/)
 
-From the command line, run: R CMD INSTALL poRe_0.17.tar.gz
+From the command line, run: 
+
+```sh
+R CMD INSTALL poRe_0.17.tar.gz
+```
 
 
