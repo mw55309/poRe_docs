@@ -53,43 +53,24 @@ meta <- read.fast5.info(oldbc,
 
 ```
 
-## Run QC in poRe
-
-If you ran pore_rt() during your nanopore run then you will have access to a metadata text file that can be used for run QC etc.  Otherwise we will have to create one (see above).  
-
-```R
-# load in pass data
-pass <- read.table("Data/run_metadata/pass.meta.txt", sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-# set standard/expected column names
-colnames(pass) <- c("filename","channel_num","read_num","read_start_time",
-                    "status","tlen","clen","len2d",
-                    "run_id","read_id","barcode","exp_start")
-
-# load in the fail data
-fail <- read.table("Data/run_metadata/fail.meta.txt", sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-# set standard/expected column names
-colnames(fail) <- c("filename","channel_num","read_num","read_start_time",
-                    "status","tlen","clen","len2d",
-                    "run_id","read_id","barcode","exp_start")
-head(pass)
-head(fail)
-```
-
-### Longest high quality read
+## Longest high quality read
 
 We can find this from the metadata:
 
 ```R
+newbc  <- system.file("/extdata/f5/new_bc", package="poRe")
+
+# extract fast5 info
+meta <- read.fast5.info(newbc)
+
 # find the maximum length
-max(pass$len2d)
+max(meta$len2d)
 
 # get the metadata for that read
-pass[pass$len2d==max(pass$len2d),]
+meta[meta$len2d==max(meta$len2d),]
 
 # We now know the longest read
-longest <- "Data/read_data/MAP006-1_2100000-2600000_fast5/LomanLabz_PC_Ecoli_K12_MG1655_20150924_MAP006_1_5005_1_ch153_file57_strand.fast5"
+longest <- rownames(meta[meta$len2d==max(meta$len2d),])[1]
 lfq <- get_fastq(longest, which="2D")
 lfa <- get_fasta(longest, which="2D")
 
@@ -98,49 +79,29 @@ cat(lfq[["2D"]], file = "longest.fastq", sep = "\n", fill = FALSE)
 cat(lfa[["2D"]], file = "longest.fasta", sep = "\n", fill = FALSE)
 ```
 
+## Yield
 
-### Yield
-
-Yield over time can be plotted with plot.cumulative.yield
+Yield over time can be plotted with plot.cumulative.yield.  Bear in mind that these plots won't make any sesne using just the sample data here!
 
 ```R
-yield.p <- plot.cumulative.yield(pass)
-yield.f <- plot.cumulative.yield(fail)
+yield <- plot.cumulative.yield(meta)
 ```
 
 The calculated cumulative yields are returned as data.frames
 
 ```R
-head(yield.p)
-head(yield.f)
+head(yield)
 ```
 
-### Read length histogram
+## Read length histogram
 
-We can plot read lengths histograms
+We can plot read lengths histograms.  Bear in mind that these plots won't make any sesne using just the sample data here!
 
 ```R
-plot.length.histogram(pass)
-plot.length.histogram(fail)
+plot.length.histogram(meta)
 ```
 
-There's quite a long failed template read!
-
-```R
-max(fail$tlen)
-# [1] 379692
-fail [fail$tlen==379692,]
-```
-
-Plotting in ggplot2 if you really want to
-
-```R
-library(ggplot2)
-m <- ggplot(pass, aes(x=len2d))
-m + geom_histogram(binwidth=500)
-```
-
-### Channel and pore occupancy
+## Channel and pore occupancy
 
 The MinION flowcell is arranged into 512 channels in 4 blocks, and we can see the layout using poRe:
 
@@ -148,15 +109,15 @@ The MinION flowcell is arranged into 512 channels in 4 blocks, and we can see th
 show.layout()
 ```
 
+Bear in mind that these plots won't make any sesne using just the sample data here!
+
 We first calculate some statistics summarised by channel:
 
 ```R
-# pass data
-pass.s <- summarise.by.channel(pass)
-head(pass.s)
+meta <- read.meta.info(newbc)
 
-fail.s <- summarise.by.channel(fail)
-head(fail.s)
+meta.s <- summarise.by.channel(meta)
+head(meta.s)
 ```
 
 The rows of the result are the channel numbers, and the columns tell us how many channels appear in our summary data, and either the number (n) or cumulative length (l) of template, complement and 2d reads from each channel.
@@ -164,29 +125,10 @@ The rows of the result are the channel numbers, and the columns tell us how many
 We can plot these:
 
 ```R
-# pass
-
 # the number of times the channel appears in any context
-plot.channel.summary(pass.s)
+plot.channel.summary(meta.s)
 
 # cumulative 2D length
-plot.channel.summary(pass.s, report.col="l2d")
-
-# fail
-
-# the number of times the channel appears in any context
-plot.channel.summary(fail.s)
-
-# cumulative 2D length
-plot.channel.summary(fail.s, report.col="l2d")
-
+plot.channel.summary(meta.s, report.col="l2d")
 ```
-
-
-
-
-
-
-
-
 
