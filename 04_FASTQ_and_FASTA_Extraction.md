@@ -104,7 +104,27 @@ for (f5 in f5files) {
 }
 ```
 
-However, we have scripts that do this already, so there is no need to write your own!
+The above will output the FASTQ data to the console, but if we want to output to a file, we simply change one line:
+
+```R
+# path to fast5 files
+f5dir <- system.file("/extdata/f5/new_bc", package="poRe")
+# get vector of all fast5 files
+f5files <- dir(f5dir, pattern="\\.fast5$", full.names = TRUE)
+# iterate over files
+for (f5 in f5files) {
+    # extract 2D fastq
+    fq <- get_fastq(f5, which="2D")
+    # check fq is a list and contains 2D
+    if (typeof(fq) == "list" && exists("2D", where=fq)) {
+        # cat to "" (STDOUT but could be the name of a file
+        # change the cat = "" to a filename to see what happens
+        **cat(fq[["2D"]], file = "output.2D.fastq", sep = "\n", fill = FALSE)**
+    }
+}
+```
+
+However, we have scripts (see below) that do this already, so there is no need to write your own!
 
 ## Extract FASTA in the client
 
