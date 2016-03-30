@@ -119,10 +119,12 @@ for (f5 in f5files) {
     if (typeof(fq) == "list" && exists("2D", where=fq)) {
         # cat to "" (STDOUT but could be the name of a file
         # change the cat = "" to a filename to see what happens
-        **cat(fq[["2D"]], file = "output.2D.fastq", sep = "\n", fill = FALSE)**
+        cat(fq[["2D"]], file = "output.2D.fastq", sep = "\n", fill = FALSE)
     }
 }
 ```
+
+(note line **cat(fq[["2D"]], file = "output.2D.fastq", sep = "\n", fill = FALSE)** has changed)
 
 However, we have scripts (see below) that do this already, so there is no need to write your own!
 
