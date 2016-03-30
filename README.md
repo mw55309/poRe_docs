@@ -6,11 +6,11 @@ This documentation is designed to work with version 0.17
 
 ## GUIs
 
-The major aspect of this release is the release of two new GUIs (graphical user interfaces).
+The major aspect of this release is the release of two new GUIs (graphical user interfaces) - these are for testing only and should be considered a beta release.  Please use and provide feedback!
 
-If using poRe from within R, these GUIs should be what you use to extract metadata and FASTQ/A.
+In future, these GUIs should be what you use to extract metadata and FASTQ/A.
 
-However all of the old familiar functions are still there and still supported if you want to use them.
+However all of the old familiar functions are still there and are still supported if you want to use them.
 
 The pore_rt() GUI is designed to run alongside metrichor and can extract FASTQ and metadata whilst metrichor is running
 
