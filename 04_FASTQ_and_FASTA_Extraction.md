@@ -132,8 +132,35 @@ However, we have scripts (see below) that do this already, so there is no need t
 
 Simply use get_fasta instead of get_fastq :-)
 
-## Extracting FASTQ from the command-line
+## Extracting FASTQ using extract.run.fastq
 
+The function extract.run.fastq was probably the first one we wrote, and we hardly use it anymore - but we leave it here for legacy purposes.  This will create a separate file for each FASTQ sequence.
+
+### New format
+
+```R
+# we will use data packaged up with poRe as an example
+newbc  <- system.file("/extdata/f5/new_bc", package="poRe")
+
+# extract FASTQ into directory C:/MinION/FASTQ
+extract.run.fastq(dir=newbc, dest="C:/MinION/FASTQ")
+```
+
+### Old format
+
+```R
+# we will use data packaged up with poRe as an example
+oldbc  <- system.file("/extdata/f5/old_bc", package="poRe")
+
+# extract FASTQ into directory C:/MinION/FASTQ
+extract.run.fastq(dir=newbc, dest="C:/MinION/FASTQ", path.t = "/Analyses/Basecall_2D_000/", path.c = "/Analyses/Basecall_2D_000/")
+```
+
+## Extracting FASTA using extract.run.fasta
+
+Pretty much the same as extract.run.fastq but use extract.run.fasta insetad!
+
+## Extracting FASTQ from the command-line
 
 Command-line scripts for extracting FASTQ can be pulled from [github](https://github.com/mw55309/poRe_scripts).  There are scripts there that can parse both the old and new format of fast5 file, but we have installed the old format scripts here:
 
