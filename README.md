@@ -15,3 +15,12 @@ However all of the old familiar functions are still there and still supported if
 The pore_rt() GUI is designed to run alongside metrichor and can extract FASTQ and metadata whilst metrichor is running
 
 The pore_parallel() GUI is designed to run after FAST5 files have been base-called, and extracts FASTQ and metadata using a point-and-click interface.
+
+## Getting help
+
+Please, please, please sign up to the announce and support [mailing lists](https://sourceforge.net/p/rpore/mailman/?source=navbar)
+
+Send an E-mail to the support list and we will get back to you ASAP
+
+Listen to the announce list for updates to the software.
+
