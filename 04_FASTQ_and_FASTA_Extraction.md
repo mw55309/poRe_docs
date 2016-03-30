@@ -25,6 +25,26 @@ FAST5 v1.1
 * /Analyses/Basecall_**1D**_000/BaseCalled_template/
 * /Analyses/Basecall_**1D**_000/BaseCalled_complement/
 
+## Are your data base-called?
+
+By a long way, the biggest issue we see from users are where the user tries to use poRe on FAST5 files that have not been base-called by metrichor.
+
+If you want to check if your data have been base-called, use:
+
+```R
+# we will use example data packaged with poRe
+newbc  <- system.file("/extdata/f5/new_bc", package="poRe")
+
+# check if basecalled
+are.my.data.basecalled(newbc)
+
+# we will use example data packaged with poRe
+newraw  <- system.file("/extdata/f5/new_raw", package="poRe")
+
+# check if basecalled
+are.my.data.basecalled(newraw)
+```
+
 ## Extract FASTQ in the client
 
 We'll see how to extract FASTQ from entire directories below, but here are some exemples of single file analysis
