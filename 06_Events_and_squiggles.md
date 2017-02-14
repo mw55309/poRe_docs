@@ -8,10 +8,23 @@ get.events again returns a list, wth the template and complement events as data 
 
 ```R
 f5 <- "Data/read_data/MAP006-1_2100000-2600000_fast5/LomanLabz_PC_Ecoli_K12_MG1655_20150924_MAP006_1_5005_1_ch56_file159_strand.fast5"
+
+# OLD FORMAT
 ev <- get.events(f5, path.t = "/Analyses/Basecall_2D_000/", path.c = "/Analyses/Basecall_2D_000/")
 names(ev)
 head(ev$template)
 head(ev$complement)
+
+# NEW FORMAT
+ev <- get.events(f5)
+names(ev)
+head(ev$template)
+head(ev$complement)
+
+# 1D
+ev <- get.events(f5)
+names(ev)
+head(ev$template)
 ```
 
 * start: time in seconds
@@ -24,7 +37,9 @@ head(ev$complement)
 
 ### Extracting the model
 
-Extracting the model itself in poRe is also easy, but relies on a little legacy code that needs to be updated... next version ;-)
+Extracting the model itself in poRe is also easy, but relies on a little legacy code that needs to be updated.
+
+Since R9, the events model is not included, so the code below will not work
 
 ```R
 mods <- get.models(f5, tmodel = "/Analyses/Basecall_2D_000/BaseCalled_template/Model", 

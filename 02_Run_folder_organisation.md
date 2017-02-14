@@ -19,7 +19,7 @@ dir.create("test")
 copy.runs(dir=f5dir, dest="test")
 ```
 
-The ouutput of the above is the path of the resulting folder that the reads have been copied to
+The output of the above is the path of the resulting folder that the reads have been copied to
 
 ```
 "test/e40030db5d1193cc903f8d505011be8e9a628f6c/ONT Sequencing Workflow"

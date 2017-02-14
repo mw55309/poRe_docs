@@ -2,10 +2,10 @@
 
 ## File formats
 
-Oxford Nanopore are very bad at releasing official definitions of file formats, therefore unfortunately much guess work is involved.
+Some guess work is involved in extracting definitions of Oxford Nanopore file formats.
 
-Most of the early ONT data was released from the SQK-MAP-005 kits - this includes 
-[the MARC data](http://f1000research.com/articles/4-1075/v1), [Mick's B fragilis dataset](http://gigadb.org/dataset/100177) and [Nick Loman's first E coli dataset](http://gigadb.org/dataset/100102).  These data were encoded in what can be best described as FAST5 v.1.0 (ONT don't actually assign version numbers!)
+Most of the early ONT data was released from the SQK-MAP-005 kits - this includes [the MARC data](http://f1000research.com/articles/4-1075/v1), [Mick's B fragilis dataset](http://gigadb.org/dataset/100177) and [Nick L
+oman's first E coli dataset](http://gigadb.org/dataset/100102).  These data were encoded in what can be best described as FAST5 v.1.0 (ONT don't actually assign version numbers!)
 
 Then SQK-MAP-006 came along, which was a major chemistry change that increased throughput.  A major change is that metrichor has switched from a 5mer model to a 6mer model.   [Nick has also released E coli SQK-MAP-006 data](http://lab.loman.net/2015/09/24/first-sqk-map-006-experiment/), and because he was very quick to do this, the files are still in FAST5 v.1.0
 
@@ -25,6 +25,11 @@ FAST5 v1.1
 * /Analyses/Basecall_**1D**_000/BaseCalled_template/
 * /Analyses/Basecall_**1D**_000/BaseCalled_complement/
 
+Also note that there are many new 1D protcols that will only have:
+
+FAST5 v1.1 and above
+* /Analyses/Basecall_**1D**_000/BaseCalled_template/
+
 ## Are your data base-called?
 
 By a long way, the biggest issue we see from users are where the user tries to use poRe on FAST5 files that have not been base-called by metrichor.
@@ -33,12 +38,22 @@ If you want to check if your data have been base-called, use:
 
 ```R
 # we will use example data packaged with poRe
+# the use of system.file in this case allows us to reference
+# the example data packaged within poRe
+#
+# You will not usually use system.file.  You just need a path
+# to a directory of fast5 files
 newbc  <- system.file("/extdata/f5/new_bc", package="poRe")
 
 # check if basecalled
 are.my.data.basecalled(newbc)
 
 # we will use example data packaged with poRe
+# the use of system.file in this case allows us to reference
+# the example data packaged within poRe
+#
+# You will not usually use system.file.  You just need a path
+# to a directory of fast5 files
 newraw  <- system.file("/extdata/f5/new_raw", package="poRe")
 
 # check if basecalled
@@ -55,6 +70,11 @@ Starting off with the new format of FAST5 (what we have called 1.1) is pretty ea
 
 ```R
 # we will use example data packaged with poRe
+# the use of system.file in this case allows us to reference
+# the example data packaged within poRe
+#
+# You will not usually use system.file.  You just need a path
+# to a directory of fast5 files
 newbc  <- system.file("/extdata/f5/new_bc", package="poRe")
 
 # get a list of all fast5 files in the directory
@@ -67,7 +87,9 @@ f5 <- f5files[1]
 get_fastq(f5)
 ```
 
-This returns a list with three fastq datasets, "template", "complement" and "2D".  
+This returns a list with three fastq datasets, "template", "complement" and "2D".
+
+If you only have 1D data (as you used a 1D protocol) then the sequence is in the "template" slot  
 
 ### Old format
 
@@ -75,6 +97,11 @@ poRe can still handle the old format, we just need to change the defaults
 
 ```R
 # we will use example data packaged with poRe
+# the use of system.file in this case allows us to reference
+# the example data packaged within poRe
+#
+# You will not usually use system.file.  You just need a path
+# to a directory of fast5 files
 oldbc  <- system.file("/extdata/f5/old_bc", package="poRe")
 
 # get a list of all fast5 files in the directory
@@ -93,24 +120,45 @@ get_fastq(f5, path.t="/Analyses/Basecall_2D_000/", path.c="/Analyses/Basecall_2D
 If we don't want to extract all 3, we can choose which to extract using the "which" argument
 
 ```R
+# in the OLD FORMAT, template/1D is in Basecall_2D_000
 get_fastq(f5, path.t="/Analyses/Basecall_2D_000/", which="template")
+
+# in the NEW FORMAT, template/1D is in Basecall_1D_000
+get_fastq(f5, path.t="/Analyses/Basecall_1D_000/", which="template")
 ```
 
 Working with lists is easy in R, and if you want the FASTQ as a string:
 
 ```R
+# OLD FORMAT
 fq <- get_fastq(f5, path.t="/Analyses/Basecall_2D_000/", path.c="/Analyses/Basecall_2D_000/", which="all")
 names(fq)
+fq$template
+
+# NEW FORMAT
+fq <- get_fastq(f5)
+names(fq)
+
+# template is the same as 1D
 fq$template
 ```
 
 From here you can see that it's incredibly simple to write a FASTQ extraction script:
 
 ```R
+
 # path to fast5 files
+# the use of system.file in this case allows us to reference
+# the example data packaged within poRe
+#
+# You will not usually use system.file.  You just need a path
+# to a directory of fast5 files
 f5dir <- system.file("/extdata/f5/new_bc", package="poRe")
 # get vector of all fast5 files
 f5files <- dir(f5dir, pattern="\\.fast5$", full.names = TRUE)
+
+## extract 2D ##
+
 # iterate over files
 for (f5 in f5files) {
     # extract 2D fastq
@@ -122,15 +170,39 @@ for (f5 in f5files) {
         cat(fq[["2D"]], file = "", sep = "\n", fill = FALSE)
     }
 }
+
+## extract 1D ##
+
+# iterate over files
+for (f5 in f5files) {
+    # extract 1D fastq
+    fq <- get_fastq(f5, which="template")
+    # check fq is a list and contains 1D/template
+    if (typeof(fq) == "list" && exists("template", where=fq)) {
+        # cat to "" (STDOUT but could be the name of a file
+        # change the cat = "" to a filename to see what happens
+        cat(fq[["template"]], file = "", sep = "\n", fill = FALSE)
+    }
+}
+
+
 ```
 
 The above will output the FASTQ data to the console, but if we want to output to a file, we simply change one line:
 
 ```R
 # path to fast5 files
+# the use of system.file in this case allows us to reference
+# the example data packaged within poRe
+#
+# You will not usually use system.file.  You just need a path
+# to a directory of fast5 files
 f5dir <- system.file("/extdata/f5/new_bc", package="poRe")
 # get vector of all fast5 files
 f5files <- dir(f5dir, pattern="\\.fast5$", full.names = TRUE)
+
+## extract 2D ##
+
 # iterate over files
 for (f5 in f5files) {
     # extract 2D fastq
@@ -142,9 +214,24 @@ for (f5 in f5files) {
         cat(fq[["2D"]], file = "output.2D.fastq", sep = "\n", fill = FALSE)
     }
 }
+
+## extract 1D ##
+
+# iterate over files
+for (f5 in f5files) {
+    # extract 1D fastq
+    fq <- get_fastq(f5, which="template")
+    # check fq is a list and contains 1D/template
+    if (typeof(fq) == "list" && exists("template", where=fq)) {
+        # cat to "" (STDOUT but could be the name of a file
+        # change the cat = "" to a filename to see what happens
+        cat(fq[["template"]], file = "output.1D.fastq", sep = "\n", fill = FALSE)
+    }
+}
 ```
 
 (note line **cat(fq[["2D"]], file = "output.2D.fastq", sep = "\n", fill = FALSE)** has changed)
+(note line **cat(fq[["template"]], file = "output.1D.fastq", sep = "\n", fill = FALSE)** has changed)
 
 However, we have scripts (see below) that do this already, so there is no need to write your own!
 
@@ -188,7 +275,7 @@ Command-line scripts for extracting FASTQ can be pulled from [github](https://gi
 # 2D
 extract2D Data/read_data/MAP006-1_2100000-2600000_fast5/ > MAP006-1.2D.fastq
 
-# template
+# template or 1D
 extractTemplate Data/read_data/MAP006-1_2100000-2600000_fast5/ > MAP006-1.template.fastq
 
 # complement

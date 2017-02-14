@@ -2,10 +2,9 @@
 
 ## File formats
 
-Oxford Nanopore are very bad at releasing official definitions of file formats, therefore unfortunately much guess work is involved.
+Some guess work is involved in extracting definitions of Oxford Nanopore file formats.  
 
-Most of the early ONT data was released from the SQK-MAP-005 kits - this includes 
-[the MARC data](http://f1000research.com/articles/4-1075/v1), [Mick's B fragilis dataset](http://gigadb.org/dataset/100177) and [Nick Loman's first E coli dataset](http://gigadb.org/dataset/100102).  These data were encoded in what can be best described as FAST5 v.1.0 (ONT don't actually assign version numbers!)
+Most of the early ONT data was released from the SQK-MAP-005 kits - this includes [the MARC data](http://f1000research.com/articles/4-1075/v1), [Mick's B fragilis dataset](http://gigadb.org/dataset/100177) and [Nick Loman's first E coli dataset](http://gigadb.org/dataset/100102).  These data were encoded in what can be best described as FAST5 v.1.0 (ONT don't actually assign version numbers!)
 
 Then SQK-MAP-006 came along, which was a major chemistry change that increased throughput.  A major change is that metrichor has switched from a 5mer model to a 6mer model.   [Nick has also released E coli SQK-MAP-006 data](http://lab.loman.net/2015/09/24/first-sqk-map-006-experiment/), and because he was very quick to do this, the files are still in FAST5 v.1.0
 
@@ -25,6 +24,10 @@ FAST5 v1.1
 * /Analyses/Basecall_**1D**_000/BaseCalled_template/
 * /Analyses/Basecall_**1D**_000/BaseCalled_complement/
 
+Also note that there are many new 1D protcols that will only have:
+
+FAST5 v1.1 and above
+* /Analyses/Basecall_**1D**_000/BaseCalled_template/
 
 ## Extracting meta-data from fast5
 If you haven't run pore_rt(), then you can extract meta-data directly from the fast5 files.  This takes a long time as we have to open each file and extract the attributes.  We will use a simple example here.
@@ -34,6 +37,11 @@ There are three functions for extracting metadata: **read.fast5.info**, **read.m
 ### New format
 
 ```R
+# the use of system.file in this case allows us to reference 
+# the example data packaged within poRe
+# 
+# You will not usually use system.file.  You just need a path 
+# to a directory of fast5 files
 newbc  <- system.file("/extdata/f5/new_bc", package="poRe")
 
 # extract fast5 info
@@ -44,6 +52,11 @@ meta <- read.fast5.info(newbc)
 ### Old format
 
 ```R
+# the use of system.file in this case allows us to reference
+# the example data packaged within poRe
+#
+# You will not usually use system.file.  You just need a path
+# to a directory of fast5 files
 oldbc  <- system.file("/extdata/f5/old_bc", package="poRe")
 
 # extract fast5 info
@@ -58,12 +71,17 @@ meta <- read.fast5.info(oldbc,
 We can find this from the metadata:
 
 ```R
+# the use of system.file in this case allows us to reference
+# the example data packaged within poRe
+#
+# You will not usually use system.file.  You just need a path
+# to a directory of fast5 files
 newbc  <- system.file("/extdata/f5/new_bc", package="poRe")
 
 # extract fast5 info
 meta <- read.fast5.info(newbc)
 
-# find the maximum length
+# find the maximum length (2D)
 max(meta$len2d)
 
 # get the metadata for that read
@@ -78,6 +96,37 @@ lfa <- get_fasta(longest, which="2D")
 cat(lfq[["2D"]], file = "longest.fastq", sep = "\n", fill = FALSE)
 cat(lfa[["2D"]], file = "longest.fasta", sep = "\n", fill = FALSE)
 ```
+
+For 1D data, the above code would be:
+
+```R
+# the use of system.file in this case allows us to reference
+# the example data packaged within poRe
+#
+# You will not usually use system.file.  You just need a path
+# to a directory of fast5 files
+newbc  <- system.file("/extdata/f5/new_bc", package="poRe")
+
+# extract fast5 info
+meta <- read.fast5.info(newbc)
+
+# find the maximum length - 1D is template so we
+# look at tlen (template length)
+max(meta$tlen)
+
+# get the metadata for that read
+meta[meta$tlen==max(meta$tlen),]
+
+# We now know the longest read
+longest <- rownames(meta[meta$tlen==max(meta$tlen),])[1]
+lfq <- get_fastq(longest, which="template")
+lfa <- get_fasta(longest, which="template")
+
+# write fastq and fasta out to files
+cat(lfq[["template"]], file = "longest.fastq", sep = "\n", fill = FALSE)
+cat(lfa[["template"]], file = "longest.fasta", sep = "\n", fill = FALSE)
+```
+
 
 ## Yield
 
